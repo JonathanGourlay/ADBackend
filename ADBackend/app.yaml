@@ -1,0 +1,7 @@
+runtime: aspnetcore
+env: flex
+beta_settings:
+  cloud_sql_instances: ad-assignment-one:europe-west1:ad-assignment-database=tcp:1433
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 3
