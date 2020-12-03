@@ -50,6 +50,28 @@ namespace ADBackend.API.Controllers
             return Ok(_itemRepo.CreateItem(itemsObject));
         }
 
+        [HttpPost("update")]
+        public IActionResult UpdateItem([FromForm] ItemsObject itemsObject)
+        {
+            var tokenResult = ValidateFirebaseToken(itemsObject.Token);
+
+            if (tokenResult == null)
+                return Unauthorized();
+
+            return Ok(_itemRepo.UpdateItem(itemsObject));
+        }
+
+        [HttpPost("delete")]
+        public IActionResult DeleteItem([FromForm] int id, string token)
+        {
+            var tokenResult = ValidateFirebaseToken(token);
+
+            if (tokenResult == null)
+                return Unauthorized();
+
+            return Ok(_itemRepo.DeleteItem(id));
+        }
+
         [HttpPost("is-admin")]
         [ProducesResponseType(typeof(bool), 200)]
         public IActionResult IsUserAdmin([FromBody] string token)

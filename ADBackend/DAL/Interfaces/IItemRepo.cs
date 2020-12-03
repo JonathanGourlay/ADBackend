@@ -14,6 +14,8 @@ namespace ADBackend.DAL.Interfaces
         IEnumerable GetAllItemsDS();
         IEnumerable GetItemByIdDS(int Id);
         bool CreateItem(ItemsObject itemsObject);
+        bool DeleteItem(int id);
+        bool UpdateItem(ItemsObject itemsObject);
 
     }
 }

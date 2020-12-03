@@ -62,6 +62,46 @@ namespace ADBackend.DAL.Repository
             }
 }
 
+        public bool UpdateItem(ItemsObject itemsObject)
+        {
+            try
+            {
+                Query query = new Query("Stock")
+                {
+                    Filter = Filter.And(Filter.Equal("ItemID", itemsObject.ItemID))
+                };
+                var results = _db.RunQuery(query).Entities;
+                var item = results.FirstOrDefault();
+                var task = new Entity()
+                {
+                    Key = _db.CreateKeyFactory("Stock").CreateKey(item.Key.Path.First().Id),
+                    ["ItemID"] = itemsObject.ItemID,
+                    ["Name"] = itemsObject.Name,
+                    ["Description"] = itemsObject.Description,
+                    ["Price"] = itemsObject.Price,
+                    ["Stock Count"] = itemsObject.StockCount
+                };
+                task.Key = _db.Upsert(task);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+        public bool DeleteItem(int Id)
+        {
+            Query query = new Query("Stock")
+            {
+                Filter = Filter.And(Filter.Equal("ItemID", Id))
+            };
+            var results = _db.RunQuery(query).Entities;
+            var item = results.FirstOrDefault();
+            _db.Delete(new Key().WithElement("Stock", item.Key.Path.First().Id));
+            return true;
+        }
+
         //public  IEnumerable GetAllItems()
         //{
         //    ItemsObject itemsObject = new ItemsObject();
