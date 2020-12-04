@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ADBackend.objects;
 
 namespace ADBackend.DAL.Interfaces
 {
@@ -17,5 +18,6 @@ namespace ADBackend.DAL.Interfaces
         bool DeleteItem(int id);
         bool UpdateItem(ItemsObject itemsObject);
 
+        bool CreateOrder(basketObject basket, string uid);
     }
 }

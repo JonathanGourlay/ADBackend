@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ADBackend.DAL.Interfaces;
+using ADBackend.objects;
 using Dapper;
 using Google.Cloud.Datastore.V1;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace ADBackend.DAL.Repository
 {
@@ -25,7 +27,7 @@ namespace ADBackend.DAL.Repository
             {
             };
             var results = _db.RunQuery(query).Entities;
-            return results.Select(x => new ItemsObject { Description = x.Properties["Description"].StringValue, ItemID = (int)x.Properties["ItemID"].IntegerValue, Name = x.Properties["Name"].StringValue, Price = (float)x.Properties["Price"].DoubleValue, StockCount = (int)x.Properties["Stock Count"].IntegerValue }); ;
+            return results.Select(x => new ItemsObject { Description = x.Properties["Description"].StringValue, ItemID = (int)x.Properties["ItemID"].IntegerValue, Name = x.Properties["Name"].StringValue, Price = (float)x.Properties["Price"].DoubleValue, StockCount = (int)x.Properties["Stock Count"].IntegerValue, ImageURL = x.Properties["Image URL"].StringValue }); ;
         }
 
         public IEnumerable GetItemByIdDS(int Id)
@@ -36,7 +38,7 @@ namespace ADBackend.DAL.Repository
                 Filter = Filter.And(Filter.Equal("ItemID",Id))
             };
             var results = _db.RunQuery(query).Entities;
-            return results.Select(x => new ItemsObject { Description = x.Properties["Description"].StringValue, ItemID = (int)x.Properties["ItemID"].IntegerValue, Name = x.Properties["Name"].StringValue, Price = (float)x.Properties["Price"].DoubleValue, StockCount = (int)x.Properties["Stock Count"].IntegerValue }); ;
+            return results.Select(x => new ItemsObject { Description = x.Properties["Description"].StringValue, ItemID = (int)x.Properties["ItemID"].IntegerValue, Name = x.Properties["Name"].StringValue, Price = (float)x.Properties["Price"].DoubleValue, StockCount = (int)x.Properties["Stock Count"].IntegerValue, ImageURL = x.Properties["Image URL"].StringValue, }); ;
         }
 
         public bool CreateItem(ItemsObject itemsObject)
@@ -50,7 +52,8 @@ namespace ADBackend.DAL.Repository
                     ["Name"] = itemsObject.Name,
                     ["Description"] = itemsObject.Description,
                     ["Price"] = itemsObject.Price,
-                    ["Stock Count"] = itemsObject.StockCount
+                    ["Stock Count"] = itemsObject.StockCount,
+                    ["Image URL"] = itemsObject.ImageURL
                 };
                 task.Key = _db.Insert(task);
                 return true;
@@ -61,6 +64,25 @@ namespace ADBackend.DAL.Repository
                 throw;
             }
 }
+        public bool CreateOrder(basketObject basket, string uid)
+        {
+            try
+            {
+                var task = new Entity()
+                {
+                    Key = _db.CreateKeyFactory("Orders").CreateIncompleteKey(),
+                    ["Basket"] = JsonConvert.SerializeObject(basket.BasketItems),
+                    ["Uid"] = uid,
+                };
+                task.Key = _db.Insert(task);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
 
         public bool UpdateItem(ItemsObject itemsObject)
         {
@@ -79,7 +101,8 @@ namespace ADBackend.DAL.Repository
                     ["Name"] = itemsObject.Name,
                     ["Description"] = itemsObject.Description,
                     ["Price"] = itemsObject.Price,
-                    ["Stock Count"] = itemsObject.StockCount
+                    ["Stock Count"] = itemsObject.StockCount,
+                    ["Image URL"] = itemsObject.ImageURL
                 };
                 task.Key = _db.Upsert(task);
                 return true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ADBackend.DAL.Interfaces;
+using ADBackend.objects;
 using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -82,7 +83,13 @@ namespace ADBackend.API.Controllers
                 return Unauthorized();
             return Ok(_userRepo.IsUserAdmin(tokenResult));
         }
+        [HttpPost("create-order")]
+        public IActionResult CreateOrder([FromBody] basketObject basket)
+        {
+            var tokenResult = ValidateFirebaseToken(basket.Token);
 
+            return Ok(_itemRepo.CreateOrder(basket, tokenResult));
+        }
         private string ValidateFirebaseToken(string token)
         {
             try
