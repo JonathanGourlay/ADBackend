@@ -23,20 +23,14 @@ namespace ADBackend.DAL.Repository
 
         public bool IsUserAdmin(string token)
         {
-
             Query query = new Query("Admin")
             {
                 Filter = Filter.And(Filter.Equal("UID", token))
             };
             var results = _db.RunQuery(query).Entities;
             bool result = results.Any();
-            return result
-            ;
+            return result;
         }
-
-
-
-
     }
 }
 

@@ -14,10 +14,13 @@ namespace ADBackend.DAL.Interfaces
 
         IEnumerable GetAllItemsDS();
         IEnumerable GetItemByIdDS(int Id);
+        IEnumerable<BasketObject> GetOrders(string uid);
+        IEnumerable<BasketObject> GetAdminOrders(string uid);
+
         bool CreateItem(ItemsObject itemsObject);
         bool DeleteItem(int id);
         bool UpdateItem(ItemsObject itemsObject);
 
-        bool CreateOrder(basketObject basket, string uid);
+        bool CreateOrder(BasketObject basket, string uid);
     }
 }

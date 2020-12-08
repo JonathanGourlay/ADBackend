@@ -3,15 +3,19 @@ using System.Collections.Generic;
 
 namespace ADBackend.objects 
 {
-    public class basketObject : Item
+    public class BasketObject : Item
     {
-       public List<basketItem> BasketItems { get; set; }
+        public string Id { get; set; }
+        public string Uid { get; set; }
+        public List<BasketItem> BasketItems { get; set; }
+        public double OrderTotal { get; set; }
 
     }
 
-    public class basketItem
+    public class BasketItem
     {
         public int ItemId { get; set; }
+        public string Name { get; set; }
         public int Quantity { get; set; }
     }
 }

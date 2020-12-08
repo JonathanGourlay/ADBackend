@@ -38,7 +38,7 @@ namespace ADBackend
             {
                 options.AddPolicy("CORS", builder =>
                 {
-                    builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                    builder.WithOrigins("http://localhost:3000", "https://ad-front-end-dot-ad-assignment-one.ey.r.appspot.com").AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                 });
             });
 

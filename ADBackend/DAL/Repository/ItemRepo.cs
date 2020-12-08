@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 using ADBackend.DAL.Interfaces;
 using ADBackend.objects;
 using Dapper;
 using Google.Cloud.Datastore.V1;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace ADBackend.DAL.Repository
 {
@@ -64,15 +65,16 @@ namespace ADBackend.DAL.Repository
                 throw;
             }
 }
-        public bool CreateOrder(basketObject basket, string uid)
+        public bool CreateOrder(BasketObject basket, string uid)
         {
             try
             {
                 var task = new Entity()
                 {
                     Key = _db.CreateKeyFactory("Orders").CreateIncompleteKey(),
-                    ["Basket"] = JsonConvert.SerializeObject(basket.BasketItems),
+                    ["Basket"] = JsonSerializer.Serialize(basket.BasketItems),
                     ["Uid"] = uid,
+                    ["Order Total"] = basket.OrderTotal,
                 };
                 task.Key = _db.Insert(task);
                 return true;
@@ -84,6 +86,37 @@ namespace ADBackend.DAL.Repository
             }
         }
 
+        public IEnumerable<BasketObject> GetOrders(string Uid)
+        {
+
+            Query query = new Query("Orders")
+            {
+                Filter = Filter.And(Filter.Equal("Uid", Uid))
+            };
+            var results = _db.RunQuery(query).Entities;
+            return results.Select(x => new BasketObject
+            {
+                Id = x.Key.Path.First().Id.ToString(),
+                Uid = x.Properties["Uid"].StringValue,
+                OrderTotal = (double)x.Properties["Order Total"],
+                BasketItems = JsonSerializer.Deserialize<List<BasketItem>>(x.Properties["Basket"].StringValue)
+            });
+        }
+        public IEnumerable<BasketObject> GetAdminOrders(string Uid)
+        {
+
+            Query query = new Query("Orders")
+            {
+            };
+            var results = _db.RunQuery(query).Entities;
+            return results.Select(x => new BasketObject
+            {
+                Id = x.Key.Path.First().Id.ToString(),
+                Uid = x.Properties["Uid"].StringValue,
+                OrderTotal = (double)x.Properties["Order Total"],
+                BasketItems = JsonSerializer.Deserialize<List<BasketItem>>(x.Properties["Basket"].StringValue)
+            });
+        }
         public bool UpdateItem(ItemsObject itemsObject)
         {
             try
